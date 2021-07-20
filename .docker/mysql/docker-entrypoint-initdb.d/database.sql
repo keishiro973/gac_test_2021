@@ -1,8 +1,8 @@
-create database gac_test;
+create database IF NOT EXISTS gac_test;
 use gac_test;
 
 -- TABLE VEHICLE
-CREATE TABLE `vehicle`
+CREATE TABLE IF NOT EXISTS `vehicle`
 (
     `vehicle_id`   int(10) unsigned NOT NULL AUTO_INCREMENT,
     `plate_number` varchar(20)      NOT NULL COMMENT '',
@@ -16,7 +16,7 @@ CREATE TABLE `vehicle`
 
 -- TABLE EXPENSE
 -- RELATION 1-N avec vehicle
-CREATE TABLE `expense`
+CREATE TABLE IF NOT EXISTS `expense`
 (
     `expense_id`     int(10) unsigned                                                 NOT NULL AUTO_INCREMENT,
     `vehicle_id`     int(10) unsigned                                                 NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE `expense`
 
 -- TABLE GAC_STATION
 -- RELATION 1-1 avec expense
-CREATE TABLE `gas_station`
+CREATE TABLE IF NOT EXISTS `gas_station`
 (
     `gas_station_id`  int(10) unsigned NOT NULL,
     `expense_id`      int(10) unsigned NOT NULL,
