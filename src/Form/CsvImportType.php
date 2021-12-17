@@ -16,16 +16,16 @@ class CsvImportType extends AbstractType
         $builder
             ->add('file', FileType::class, [
                     'label' => 'CSV File',
-                    'mapd' => false,
+                    'mapped' => false,
                     'required' => true,
-                    'constraints' => [
-                        new File([
-                            'mimeTypes' => [
-                                'text/csv',
-                            ],
-                            'mimeTypesMessage' => 'Veuillez uploader un fichier CSV valide',
-                        ])
-                    ],
+//                    'constraints' => [
+//                        new File([
+//                            'mimeTypes' => [
+//                                'text/csv',
+//                            ],
+//                            'mimeTypesMessage' => 'Veuillez uploader un fichier CSV valide',
+//                        ])
+//                    ],
                 ]
             )
         ->add('save', SubmitType::class)
