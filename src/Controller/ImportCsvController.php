@@ -16,7 +16,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class ImportCsvController extends AbstractController
 {
     /**
-     * @Route("/import/csv", name="import_csv")
+     * @Route("/import", name="import_csv")
      */
     public function index(Request $request, UploadFile $uploadFile, ImportCsv $importCsv): Response
     {

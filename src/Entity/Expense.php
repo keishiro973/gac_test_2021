@@ -37,6 +37,13 @@ class Expense
     private $invoiceNumber;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="string", length=255, nullable=true)
+     */
+    private $description;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="issued_on", type="datetime", nullable=false)
@@ -179,6 +186,24 @@ class Expense
     {
         $this->vehicle = $vehicle;
 
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return Expense
+     */
+    public function setDescription(string $description): Expense
+    {
+        $this->description = $description;
         return $this;
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use CrEOF\Spatial\PHP\Types\Geography\Point;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,9 +30,9 @@ class GasStation
     private $description;
 
     /**
-     * @var string
+     * @var Point
      *
-     * @ORM\Column(name="coordinate", type="string", length=0, nullable=false)
+     * @ORM\Column(name="coordinate", type="point", length=0, nullable=false)
      */
     private $coordinate;
 
@@ -62,12 +63,12 @@ class GasStation
         return $this;
     }
 
-    public function getCoordinate(): ?string
+    public function getCoordinate(): ?Point
     {
         return $this->coordinate;
     }
 
-    public function setCoordinate(string $coordinate): self
+    public function setCoordinate(Point $coordinate): self
     {
         $this->coordinate = $coordinate;
 
