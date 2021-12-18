@@ -24,7 +24,7 @@ class UploadFile
     {
         $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFileName = $this->slugger->slug($originalFileName);
-        $newFileName = $safeFileName.'-'.uniqid().$file->guessExtension();
+        $newFileName = $safeFileName.'-'.uniqid().'.'.$file->getClientOriginalExtension();
 
         $file->move($this->getTargetDirectory(), $newFileName);
 
