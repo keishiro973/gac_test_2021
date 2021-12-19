@@ -170,7 +170,6 @@ class ImportCsv
         if ($cpt % self::limiteFlush === 0) {
             $this->em->flush();
             $this->em->clear();
-            dump($cpt);
         }
     }
 }

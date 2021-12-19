@@ -159,9 +159,10 @@ class Expense
         return $this->valueTe;
     }
 
-    public function setValueTe(string $valueTe): self
+    public function setValueTe(float $valueTe): self
     {
-        if (strlen($valueTe) > 10) {
+        $split = str_split($valueTe);
+        if (count($split) >10) {
             throw new \InvalidArgumentException('Valeur trop grande');
         }
         $this->valueTe = $valueTe;
@@ -174,7 +175,7 @@ class Expense
         return $this->taxRate;
     }
 
-    public function setTaxRate(string $taxRate): self
+    public function setTaxRate(float $taxRate): self
     {
         $this->taxRate = $taxRate;
 
@@ -186,9 +187,10 @@ class Expense
         return $this->valueTi;
     }
 
-    public function setValueTi(string $valueTi): self
+    public function setValueTi(float $valueTi): self
     {
-        if (strlen($valueTi) > 10) {
+        $split = str_split($valueTi);
+        if (count($split) >10) {
             throw new \InvalidArgumentException('Valeur trop grande');
         }
         $this->valueTi = $valueTi;
