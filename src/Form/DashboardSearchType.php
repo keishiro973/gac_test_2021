@@ -13,7 +13,7 @@ class DashboardSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('BeginDate', DateTimeType::class, [
+            ->add('beginDate', DateTimeType::class, [
                     'label' => 'Date de début',
                 ]
             )

@@ -20,7 +20,7 @@ class DashboardController extends AbstractController
         $endDate = new \DateTime();
 
         $form = $this->createForm(DashboardSearchType::class, [
-            'BeginDate' => $startDate,
+            'beginDate' => $startDate,
             'endDate' => $endDate,
         ]);
 
