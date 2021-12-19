@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Vehicle;
 
@@ -20,63 +21,63 @@ class Expense
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $expenseId;
+    private int $expenseId;
 
     /**
      * @var string
      *
      * @ORM\Column(name="expense_number", type="string", length=64, nullable=false)
      */
-    private $expenseNumber;
+    private string $expenseNumber;
 
     /**
      * @var string
      *
      * @ORM\Column(name="invoice_number", type="string", length=255, nullable=false)
      */
-    private $invoiceNumber;
+    private string $invoiceNumber;
 
     /**
      * @var string
      *
      * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
-    private $description;
+    private string $description;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(name="issued_on", type="datetime", nullable=false)
      */
-    private $issuedOn;
+    private DateTime $issuedOn;
 
     /**
      * @var string
      *
      * @ORM\Column(name="category", type="string", length=0, nullable=false)
      */
-    private $category;
+    private string $category;
 
     /**
-     * @var string
+     * @var float
      *
      * @ORM\Column(name="value_te", type="decimal", precision=10, scale=3, nullable=false)
      */
-    private $valueTe;
+    private float $valueTe;
 
     /**
-     * @var string
+     * @var float
      *
      * @ORM\Column(name="tax_rate", type="decimal", precision=5, scale=3, nullable=false)
      */
-    private $taxRate;
+    private float $taxRate;
 
     /**
-     * @var string
+     * @var float
      *
      * @ORM\Column(name="value_ti", type="decimal", precision=10, scale=3, nullable=false)
      */
-    private $valueTi;
+    private float $valueTi;
 
     /**
      * @var Vehicle
@@ -86,7 +87,7 @@ class Expense
      *   @ORM\JoinColumn(name="vehicle_id", referencedColumnName="vehicle_id")
      * })
      */
-    private $vehicle;
+    private Vehicle $vehicle;
 
     public function getExpenseId(): ?int
     {
@@ -117,12 +118,24 @@ class Expense
         return $this;
     }
 
-    public function getIssuedOn(): ?\DateTimeInterface
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getIssuedOn(): ?DateTime
     {
         return $this->issuedOn;
     }
 
-    public function setIssuedOn(\DateTimeInterface $issuedOn): self
+    public function setIssuedOn(DateTime $issuedOn): self
     {
         $this->issuedOn = $issuedOn;
 
@@ -148,6 +161,9 @@ class Expense
 
     public function setValueTe(string $valueTe): self
     {
+        if (strlen($valueTe) > 10) {
+            throw new \InvalidArgumentException('Valeur trop grande');
+        }
         $this->valueTe = $valueTe;
 
         return $this;
@@ -172,6 +188,9 @@ class Expense
 
     public function setValueTi(string $valueTi): self
     {
+        if (strlen($valueTi) > 10) {
+            throw new \InvalidArgumentException('Valeur trop grande');
+        }
         $this->valueTi = $valueTi;
 
         return $this;
@@ -188,24 +207,4 @@ class Expense
 
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param string $description
-     * @return Expense
-     */
-    public function setDescription(string $description): Expense
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-
 }

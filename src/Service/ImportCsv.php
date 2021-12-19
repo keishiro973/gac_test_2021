@@ -18,7 +18,7 @@ use League\Csv\UnableToProcessCsv;
 
 class ImportCsv
 {
-    const limiteFlush = 20;
+    const limiteFlush = 200;
 
     private EntityManagerInterface $em;
     private VehicleRepository $vehicleRepository;
@@ -54,18 +54,29 @@ class ImportCsv
         $csvGasStation = [];
         $cpt = 0;
         foreach ($csv as $row) {
+            $cpt++;
+
             $csvVehicle = $this->getCurrentVehicle($row, $csvVehicle);
             $curentVehicle = $csvVehicle[$row["Immatriculation"]];
 
-            $csvExpense = $this->getCurentExpense($row, $curentVehicle, $csvExpense);
+            try{
+                $csvExpense = $this->getCurentExpense($row, $curentVehicle, $csvExpense);
+            } catch (\Exception $e) {
+                //log error
+                $this->save($cpt);
+                continue;
+            }
             $curentExpense = $csvExpense[$row["Code dépense"]];
 
-            $csvGasStation = $this->updateCsvGasStation($row, $curentExpense, $csvGasStation);
-
-            if ($cpt % self::limiteFlush === 0) {
-                $this->em->flush();
-                $this->em->clear();
+            try {
+                $csvGasStation = $this->updateCsvGasStation($row, $curentExpense, $csvGasStation);
+            } catch (\Exception $e) {
+                //log error
+                $this->save($cpt);
+                continue;
             }
+
+            $this->save($cpt);
         }
         $this->em->flush();
         $this->em->clear();
@@ -74,7 +85,7 @@ class ImportCsv
     private function getCurrentVehicle(array $row, array $csvVehicle): array
     {
         if (!in_array($row["Immatriculation"], $csvVehicle)) {
-            $dbVehicle = $this->vehicleRepository->findOneBy(['plate_number' => $row["Immatriculation"]]);
+            $dbVehicle = $this->vehicleRepository->findOneBy(['plateNumber' => $row["Immatriculation"]]);
             if ($dbVehicle) {
                 $csvVehicle[$dbVehicle->getPlateNumber()] = $dbVehicle;
             }
@@ -98,18 +109,22 @@ class ImportCsv
     private function getCurentExpense(array $row, Vehicle $curentVehicle, array $csvExpense): array
     {
         if (!in_array($row["Code dépense"], $csvExpense)) {
-            $dbExpense = $this->expenseRepository->findOneBy(['expense_number' => $row["Code dépense"]]);
+            $dbExpense = $this->expenseRepository->findOneBy(['expenseNumber' => $row["Code dépense"]]);
             if ($dbExpense) {
                 $csvExpense[$dbExpense->getExpenseNumber()] = $dbExpense;
             }
 
             if (!$dbExpense) {
-                $issueOn = new DateTime($row["Date & heure"]);
+                if(preg_match('$^2([0-9]{3})-([0-1][0-9])-([0-3][0-9])\s([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9])$',$row["Date & heure"])){
+                    $issueOn = new DateTime($row["Date & heure"]);
+                } else {
+                    throw new \InvalidArgumentException("Format date incorrect");
+                }
                 $curentExpense = (new Expense())
                     ->setCategory($row["Catégorie  de dépense"])
-                    ->setValueTe($row["HT"])
-                    ->setValueTi($row["TTC"])
-                    ->setTaxRate($row["TVA"])
+                    ->setValueTe(floatval(str_replace(',', '.',$row["HT"])))
+                    ->setValueTi(floatval(str_replace(',', '.',$row["TTC"])))
+                    ->setTaxRate(floatval(str_replace(',', '.',$row["TVA"])))
                     ->setIssuedOn($issueOn)
                     ->setInvoiceNumber($row["Numéro facture"])
                     ->setExpenseNumber($row["Code dépense"])
@@ -126,23 +141,36 @@ class ImportCsv
 
     private function updateCsvGasStation(array $row, Expense $curentExpense, array $csvGasStation): array
     {
-        if (!in_array($curentExpense->getExpenseId(), $csvGasStation)) {
-            $dbGasStation = $this->gasStationRepository->findOneBy(['expense_id' => $curentExpense->getExpenseId()]);
+        if (!in_array($curentExpense->getExpenseNumber(), $csvGasStation)) {
+            $dbGasStation = $this->gasStationRepository->findOneBy(['expense' => $curentExpense]);
             if ($dbGasStation) {
-                $csvGasStation[$curentExpense->getExpenseId()] = $dbGasStation;
+                $csvGasStation[$curentExpense->getExpenseNumber()] = $dbGasStation;
             }
 
             if (!$dbGasStation) {
                 $curentGasStation = (new GasStation())
                     ->setExpense($curentExpense)
                     ->setDescription($row["Station"])
-                    ->setCoordinate(new Point($row["Position GPS (Latitude) "], $row["Position GPS (Longitude)"]));
+                    ->setCoordinate(new Point($row["Position GPS (Longitude)"], $row["Position GPS (Latitude) "]));
 
-                $csvGasStation[$curentExpense->getExpenseId()] = $curentGasStation;
+                $csvGasStation[$curentExpense->getExpenseNumber()] = $curentGasStation;
                 $this->em->persist($curentGasStation);
             }
         }
 
         return $csvGasStation;
+    }
+
+    /**
+     * @param int $cpt
+     * @return void
+     */
+    public function save(int $cpt): void
+    {
+        if ($cpt % self::limiteFlush === 0) {
+            $this->em->flush();
+            $this->em->clear();
+            dump($cpt);
+        }
     }
 }

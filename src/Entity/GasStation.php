@@ -41,7 +41,7 @@ class GasStation
      *
      * @ORM\ManyToOne(targetEntity="Expense")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="expense_id", referencedColumnName="expense_id")
+     *   @ORM\JoinColumn(name="expense_id", referencedColumnName="expense_id", nullable=false)
      * })
      */
     private $expense;
